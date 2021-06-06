@@ -1,0 +1,22 @@
+version: "2"
+services:
+    jupyterlab:
+        image: jupyter/scipy-notebook
+        ports: 
+            - 8888:8888
+        volumes: 
+            - ./workspace/:/home/jovyan/work
+    create-book:
+        build: images/jupyter-book
+        volumes: 
+            - ./workspace/:/home/jovyan/work
+        environment: 
+            - BOOK_NAME=${BOOK_NAME}
+        command: "jupyter-book create /home/jovyan/work/${BOOK_NAME}"
+    build-book:
+        build: images/jupyter-book
+        volumes: 
+            - ./workspace/:/home/jovyan/work
+        environment: 
+            - BOOK_NAME=${BOOK_NAME}
+        command: "jupyter-book build /home/jovyan/work/${BOOK_NAME}"
