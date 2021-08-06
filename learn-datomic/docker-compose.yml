@@ -1,0 +1,17 @@
+version: "2.0"
+services: 
+    db:
+        build:
+            context: .
+            args: 
+                user: ${MYDATOMIC_USER}
+                password: ${MYDATOMIC_PASSWORD}
+                config_file: ${DATOMIC_CONFIG}
+        ports: 
+            - "4334:4334"
+            - "4335:4335"
+        volumes: 
+            - type: bind
+              source: $PWD/$DATOMIC_CONFIG
+              target: /datomic/config/transactor.properties
+              read_only: true
