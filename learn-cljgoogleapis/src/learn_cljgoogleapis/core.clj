@@ -1,6 +1,6 @@
 (ns learn-cljgoogleapis.core
   (:require [clojure.java.io :as io]
-            [clojure.string :as string]
+            [clojure.string :as str]
             [environ.core :refer [env]])
   (:import [com.google.api.client.googleapis.auth.oauth2 GoogleCredential]
            [com.google.api.client.googleapis.javanet GoogleNetHttpTransport]
@@ -13,7 +13,7 @@
   []
   (let [creds-file (env :creds-path)
         creds-path (when-not (or (nil? creds-file)
-                                 (string/blank? creds-file))
+                                 (str/blank? creds-file))
                      (io/resource creds-file))
         in (when-not (nil? creds-path)
              (io/input-stream creds-path))]
