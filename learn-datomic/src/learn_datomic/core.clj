@@ -1,54 +1,44 @@
 (ns learn-datomic.core
-  (:require [clojure.core.async :as async]
-            [datomic.api :as d]))
+  (:require  [clojure.string :as str]))
 
-(defn- async-operation
-  [f]
-  (let [c (async/chan)]
-    (async/go
-      (try
-        (async/>! c (f))
-        (catch Exception e
-          (println (.getMessage e))
-          (async/close! c))))
-    c))
+(def schema [{:db/ident :person/name
+              :db/valueType :db.type/string
+              :db/cardinality :db.cardinality/one}
+             {:db/ident :person/age
+              :db/valueType :db.type/long
+              :db/cardinality :db.cardinality/one}])
+(def data [{:person/name "Bob"
+            :person/age 34}
+           {:person/name "Terry"
+            :person/age 22}
+           {:person/name "Mary"
+            :person/age 35}
+           {:person/name "Alice"
+            :person/age 21}])
 
-(defn- connection-operation
-  [uri db-name opts f]
-  (let [m-opts (apply hash-map opts)]
-    (async-operation
-     (fn []
-       (let [base-uri (str uri db-name)]
-         (->> (if-let [password (:password m-opts)]
-                (format "%s?password=%s" base-uri password)
-                base-uri)
-              (f)))))))
+(defn- trim-first
+  ([s] (str/triml s))
+  ([s c]
+   (let [first-c (first s)]
+     (if (= first-c c)
+       (rest s)
+       s))))
 
-(defn exists?
-  [uri db-name & opts]
-  (connection-operation
-   uri "*" opts
-   (fn [uri]
-     (->> (d/get-database-names uri)
-          (some (partial = db-name))))))
+(defn- trim-end
+  ([s] (str/trimr s))
+  ([s c]
+   (let [last-c (last s)]
+     (if (= last-c c)
+       (drop-last s)
+       s))))
 
-(defn create-db
-  [uri db-name & opts]
-  (connection-operation
-   uri db-name opts
-   (fn [uri] (d/create-database uri))))
-
-(defn create-connection
-  [uri db-name & opts]
-  (connection-operation
-   uri db-name opts
-   (fn [uri] (d/connect uri))))
-
-(defn destroy-connection
-  [conn]
-  (when-not (nil? conn)
-    (d/release conn)))
-
-(defn transact
-  [conn data]
-  (d/transact conn data))
+(defn build-uri
+  ([db-uri db-name]
+   (build-uri db-uri db-name nil))
+  ([db-uri db-name password]
+   (let [db-uri (trim-end db-uri)
+         db-name (trim-first db-name)]
+     (if-not (nil? password)
+       (format "%s/%s?password=%s"
+               db-uri db-name password)
+       (format "%s/%s" db-uri db-name)))))
