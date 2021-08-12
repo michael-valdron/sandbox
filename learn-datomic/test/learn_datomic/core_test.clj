@@ -1,48 +1,30 @@
 (ns learn-datomic.core-test
   (:require [clojure.test :as test]
-            [clojure.core.async :refer [<!!]]
             [learn-datomic.core :as core]
+            [datomic.api :as d]
             [environ.core :refer [env]]))
 
 (def db-uri (env :datomic-uri))
 (def db-name (env :datomic-db))
 (def conn (atom nil))
-(def schema
-  [{:db/ident :inv/sku
-    :db/valueType :db.type/long
-    :db/unique :db.unique/identity
-    :db/cardinality :db.cardinality/one}
-   {:db/ident :inv/color
-    :db/valueType :db.type/ref
-    :db/cardinality :db.cardinality/one}
-   {:db/ident :inv/size
-    :db/valueType :db.type/ref
-    :db/cardinality :db.cardinality/one}
-   {:db/ident :inv/type
-    :db/valueType :db.type/ref
-    :db/cardinality :db.cardinality/one}])
-(def data 
-  [{:inv/sku 0
-    :inv/color :red
-    :inv/size :small
-    :inv/type :hat}
-   {:inv/sku 1
-    :inv/color :blue
-    :inv/size :medium
-    :inv/type :shirt}])
 
 (defn- setup
   []
-  (if-not (<!! (core/exists? db-uri db-name :password (env :datomic-password)))
-    (when (<!! (core/create-db db-uri db-name :password (env :datomic-password)))
-      (reset! conn (core/create-connection db-uri db-name :password (env :datomic-password))))
-    (reset! conn (<!! (core/create-connection db-uri db-name :password (env :datomic-password))))))
+  (let [uri (core/build-uri db-uri db-name (env :datomic-password))]
+    (when-not (d/create-database uri)
+      (d/delete-database uri)
+      (d/create-database uri))
+    (reset! conn (d/connect uri))
+    (d/transact @conn core/schema)))
 
 (defn- teardown
-  []
-  (reset! conn (core/destroy-connection @conn)))
+  []  
+  (swap! conn d/release)
+  (let [uri (core/build-uri db-uri db-name (env :datomic-password))]
+    (d/delete-database uri))
+  (shutdown-agents))
 
-(defn- fixture 
+(defn- fixture
   [test-fn]
   (setup)
   (test-fn)
@@ -50,16 +32,28 @@
 
 (test/use-fixtures :once fixture)
 
-(test/deftest test-connection
-  (test/testing "Connection."
-    (test/is (not (nil? @conn)))))
+(test/deftest test-assertion
+  (test/testing "Assertion"
+    (let [result (d/transact @conn core/data)]
+      (test/is (map? @result)))))
 
-(test/deftest test-schema-assertion
-  (test/testing "Schema Assertion."
-    (let [result (core/transact @conn schema)]
-      (test/is @result))))
+(test/deftest test-read-1
+  (test/testing "Read Names"
+    (let [db-context (d/db @conn)
+          result (d/q '[:find ?name
+                        :where [?e :person/name ?name]]
+                      db-context)
+          expected #{["Bob"] ["Terry"] ["Mary"] ["Alice"]}]
+      (test/is (= expected result)))))
 
-(test/deftest test-data-assertion
-  (test/testing "Data Assertion."
-    (let [result (core/transact @conn data)]
-      (test/is @result))))
+(test/deftest test-read-2
+  (test/testing "Persons aged 30 and older"
+    (let [db-context (d/db @conn)
+          result (d/q '[:find ?name
+                        :where [?e :person/name ?name
+                                ?e :person/age ?age
+                                (>= ?age 30)]]
+                      db-context)
+          expected #{["Bob"] ["Mary"]}]
+      (test/is expected result))))
+
