@@ -17,3 +17,8 @@ pom.xml.asc
 
 # Datomic configs
 config/*.properties
+
+
+# Intellij
+.idea/
+learn-datomic.iml
