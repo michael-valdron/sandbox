@@ -3,6 +3,7 @@
 
 (def schema [{:db/ident :person/name
               :db/valueType :db.type/string
+              :db/unique :db.unique/identity
               :db/cardinality :db.cardinality/one}
              {:db/ident :person/age
               :db/valueType :db.type/long
