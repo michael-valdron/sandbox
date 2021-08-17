@@ -1,0 +1,9 @@
+build/
+.gradle/
+gradle/
+gradlew
+gradlew.bat
+
+# Intellij
+.idea/
+learn-java.impl
