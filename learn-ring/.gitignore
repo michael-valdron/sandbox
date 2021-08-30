@@ -10,6 +10,9 @@ pom.xml.asc
 /.nrepl-port
 .hgignore
 .hg/
+.lsp/
+.calva/
+.vscode/
 
 # Intellij
 .idea/
