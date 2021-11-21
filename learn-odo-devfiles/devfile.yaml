@@ -1,0 +1,53 @@
+commands:
+- exec:
+    commandLine: pip install --user -r requirements.txt
+    component: py-web
+    group:
+      isDefault: true
+      kind: build
+  id: pip-install-requirements
+- exec:
+    commandLine: python manage.py runserver 0.0.0.0:8000
+    component: py-web
+    group:
+      isDefault: true
+      kind: run
+    workingDir: ${PROJECTS_ROOT}
+  id: run-app
+- exec:
+    commandLine: python manage.py migrate
+    component: py-web
+    workingDir: ${PROJECTS_ROOT}
+  id: run-migrations
+- exec:
+    commandLine: pip install --user debugpy && export DEBUG_MODE=True && python -m
+      debugpy --listen 0.0.0.0:${DEBUG_PORT} manage.py runserver 0.0.0.0:8000 --noreload
+      --nothreading
+    component: py-web
+    group:
+      kind: debug
+    workingDir: ${PROJECTS_ROOT}
+  id: debug
+components:
+- container:
+    image: quay.io/eclipse/che-python-3.7:nightly
+    mountSources: true
+  name: py-web
+metadata:
+  description: Python3.7 with Django
+  displayName: Django
+  icon: https://static.djangoproject.com/img/logos/django-logo-positive.svg
+  language: python
+  name: mydjangoapp
+  projectType: django
+  tags:
+  - Python
+  - pip
+  - Django
+  version: 1.0.0
+schemaVersion: 2.0.0
+starterProjects:
+- git:
+    remotes:
+      origin: https://github.com/odo-devfiles/python-django-ex
+  name: django-example
