@@ -1,0 +1,6 @@
+metadata:
+  name: test-spec
+spec:
+  containers:
+    - name: test-container
+      image: docker.io/library/golang:1.24
