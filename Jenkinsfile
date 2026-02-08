@@ -6,7 +6,17 @@ pipeline {
                 echo 'building backend'
                 timeout(time: 3, unit: 'MINUTES') {
                     retry(5) {
-                        sh 'echo "building frontend" && sleep 5 && exit 1'
+                        sh 'echo "building frontend" && sleep 5'
+                    }
+                }
+            }
+        }
+        stage('deploy') {
+            steps {
+                echo 'Deploying..'
+                timeout(time: 3, unit: 'MINUTES') {
+                    retry(5) {
+                        sh './flakey-deploy.sh'
                     }
                 }
             }
