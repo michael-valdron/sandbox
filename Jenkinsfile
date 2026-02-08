@@ -1,10 +1,15 @@
 /* Requires the Docker Pipeline plugin */
 pipeline {
-    agent { docker { image 'golang:1.25.7-alpine3.23' } }
+    agent { docker { image 'alpine:3.23' } }
     stages {
         stage('build') {
             steps {
-                echo 'building'
+                echo 'building backend'
+                timeout(time: 3, unit: 'MINUTES') {
+                    retry(5) {
+                        sh 'echo "building frontend" && sleep 5'
+                    }
+                }
             }
         }
     }
