@@ -16,7 +16,7 @@ pipeline {
                 echo 'Deploying..'
                 timeout(time: 3, unit: 'MINUTES') {
                     retry(5) {
-                        sh './flakey-deploy.sh'
+                        sh 'sleep 30 && exit $(($RANDOM % 1))'
                     }
                 }
             }
