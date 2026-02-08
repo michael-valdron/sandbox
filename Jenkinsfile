@@ -6,7 +6,7 @@ pipeline {
                 echo 'building backend'
                 timeout(time: 3, unit: 'MINUTES') {
                     retry(5) {
-                        sh 'echo "building frontend" && sleep 5'
+                        sh 'echo "building frontend" && sleep 5 && exit 1'
                     }
                 }
             }
