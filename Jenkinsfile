@@ -16,7 +16,7 @@ pipeline {
                 echo 'Deploying..'
                 timeout(time: 3, unit: 'MINUTES') {
                     retry(5) {
-                        sh 'sleep 30 && exit $(($RANDOM % 1))'
+                        sh 'sleep 30 && exit $(($RANDOM % 2))'
                     }
                 }
             }
