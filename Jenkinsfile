@@ -4,8 +4,16 @@ pipeline {
     stages {
         stage('build') {
             steps {
-                sh 'go version'
+                echo 'building'
             }
+        }
+    }
+    post {
+        success {
+            echo 'build successful'
+        }
+        failure {
+            echo 'build failed'
         }
     }
 }
