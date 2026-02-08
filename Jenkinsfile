@@ -1,6 +1,5 @@
-/* Requires the Docker Pipeline plugin */
 pipeline {
-    agent { docker { image 'alpine:3.23' } }
+    agent any
     stages {
         stage('build') {
             steps {
