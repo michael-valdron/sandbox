@@ -10,7 +10,7 @@ pipeline {
                 stage('build /go') {
                     agent { 
                         docker { 
-                            image 'docker.io/library/golang:1.25.7-alpine3.23@sha256:f6751d823c26342f9506c03797d2527668d095b0a15f1862cddb4d927a7a4ced'
+                            image 'docker.io/library/golang:1.24.13-alpine3.23@sha256:8bee1901f1e530bfb4a7850aa7a479d17ae3a18beb6e09064ed54cfd245b7191'
                             args '-u root:root'
                         } 
                     }
