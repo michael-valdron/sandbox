@@ -65,7 +65,6 @@ pipeline {
                             retry(5) {
                                 dir('learn-haxe') {
                                     sh 'haxe --main Sandbox --js Sandbox.js'
-                                    sh 'haxe --main Sandbox --jvm Sandbox.jar'
                                     sh 'haxe --main Sandbox --interp'
                                 }
                             }
