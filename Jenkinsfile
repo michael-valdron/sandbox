@@ -1,5 +1,16 @@
 pipeline {
-    agent { docker { image 'golang:1.25.7-alpine3.23' } }
+    agent { 
+        docker { 
+            image 'golang:1.25.7-alpine3.23'
+            args '-u root:root'
+        } 
+    }
+
+    environment {
+        GO111MODULE = 'on'
+        CGO_ENABLED = '0'
+    }
+
     stages {
         stage('build') {
             steps {
