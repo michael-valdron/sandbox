@@ -3,7 +3,7 @@ pipeline {
     stages {
         stage('build') {
             steps {
-                sh 'echo "building backend" && go build -C go'
+                sh 'echo "building backend" && go build -C go ./...'
                 timeout(time: 3, unit: 'MINUTES') {
                     retry(5) {
                         sh 'echo "building frontend" && sleep 5'
