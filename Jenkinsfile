@@ -10,7 +10,7 @@ pipeline {
                 stage('build /go') {
                     agent { 
                         docker { 
-                            image 'golang:1.25.7-alpine3.23'
+                            image 'docker.io/library/golang:1.25.7-alpine3.23@sha256:f6751d823c26342f9506c03797d2527668d095b0a15f1862cddb4d927a7a4ced'
                             args '-u root:root'
                         } 
                     }
@@ -32,7 +32,7 @@ pipeline {
                 stage('build /learn-java') {
                     agent {
                         docker {
-                            image 'gradle:8.14-jdk11-alpine'
+                            image 'docker.io/library/gradle:8.14-jdk11-alpine@sha256:44918264f5a5a765d1b90e7513450e204c14ce2576c9df38ef0850b772b190c1'
                             args '-u root:root'
                         }
                     }
@@ -55,7 +55,7 @@ pipeline {
                 stage('build /learn-haxe') {
                     agent {
                         docker {
-                            image 'haxe:5.0.0'
+                            image 'docker.io/library/haxe:5.0.0@sha256:06ffb4b1e0fb50b064e1117c963b408099a211f2068091499e5d993b1c539fea'
                             args '-u root:root'
                         }
                     }
