@@ -1,43 +1,57 @@
 pipeline {
-    agent { 
-        docker { 
-            image 'golang:1.25.7-alpine3.23'
-            args '-u root:root'
-        } 
-    }
-
-    environment {
-        GO111MODULE = 'on'
-        CGO_ENABLED = '0'
-    }
-
     stages {
-        stage('build') {
+        stage('build /go') {
+            agent { 
+                docker { 
+                    image 'golang:1.25.7-alpine3.23'
+                    args '-u root:root'
+                } 
+            }
+
+            environment {
+                GO111MODULE = 'on'
+                CGO_ENABLED = '0'
+            }
+
             steps {
-                sh 'echo "building backend" && go build -C go -o sandbox ./...'
                 timeout(time: 3, unit: 'MINUTES') {
                     retry(5) {
-                        sh 'echo "building frontend" && sleep 5'
+                        sh 'go build -C go -o sandbox ./...'
                     }
                 }
+
             }
         }
-        stage('deploy') {
+        stage('build /learn-java') {
+            agent {
+                docker {
+                    image 'gradle:8.14-jdk11-alpine'
+                    args '-u root:root'
+                }
+            }
+
+            environment {
+                GRADLE_USER_HOME = '$HOME/.gradle'
+            }
+
             steps {
                 timeout(time: 3, unit: 'MINUTES') {
                     retry(5) {
-                        sh 'echo "Deploying.." && sleep 30'
+                        dir('learn-java') {
+                            sh 'gradle build'
+                        }
                     }
                 }
+
             }
         }
     }
     post {
         success {
-            echo 'build successful'
+            echo 'builds successful'
         }
         failure {
-            echo 'build failed'
+            echo 'builds failed'
         }
     }
 }
