@@ -1,9 +1,9 @@
 pipeline {
-    agent any
+    agent { docker { image 'golang:1.25.7-alpine3.23' } }
     stages {
         stage('build') {
             steps {
-                echo 'building backend'
+                sh 'echo "building backend" && go build -C go'
                 timeout(time: 3, unit: 'MINUTES') {
                     retry(5) {
                         sh 'echo "building frontend" && sleep 5'
@@ -13,10 +13,9 @@ pipeline {
         }
         stage('deploy') {
             steps {
-                echo 'Deploying..'
                 timeout(time: 3, unit: 'MINUTES') {
                     retry(5) {
-                        sh 'sleep 30 && exit $(($RANDOM % 2))'
+                        sh 'echo "Deploying.." && sleep 30'
                     }
                 }
             }
